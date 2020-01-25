@@ -1,3 +1,5 @@
+package FRC2020GIT.InfiniteRechargeSim;
+
 //import java.util.Random; 
 
 public class Robot {
