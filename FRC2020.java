@@ -2,7 +2,12 @@ package FRC2020GIT.InfiniteRechargeSim;
 
 public class FRC2020 {
 
-     
+     public static int getCharge(String color){
+         int charge = 1024;
+
+        
+        return charge;
+     }
 
     public static void main(String[] args) {
         Robot[] Robots= new Robot[]{new Robot("R1","red"),new Robot("R2","red"),new Robot("R3","red"),new Robot("B1","blue"),new Robot("B2","blue"),new Robot("B3","blue")};
