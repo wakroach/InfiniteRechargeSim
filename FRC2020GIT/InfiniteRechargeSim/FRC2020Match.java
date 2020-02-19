@@ -16,6 +16,18 @@ public class FRC2020Match  {
     static int ballsInBlueLoad = 5;
     static int redCharge=0;
     static int blueCharge=0;
+    static double matchTime=0;
+    static Boolean redRotate = false;
+    static Boolean blueRotate = false;
+
+    static Boolean redColor = false;
+    static Boolean blueColor = false;
+
+    // stage 0 init -> stage 1 9 charge and tele stage 2 20 charge and 
+    //rotate stage 3 20 charge and control
+
+    static int redStage=0; 
+    static int blueStage=0;
     Robot[] myRobots;
     // constructor 
     public FRC2020Match(Robot[] robots) {
@@ -29,12 +41,91 @@ public class FRC2020Match  {
             return redCharge;
         return blueCharge;
      }
+
+     public static int getStage(String color){
+        if (color.equals("red"))
+            return redStage;
+        return blueStage;
+     }
+
+     public static Boolean getRotate(String color){
+        if (color.equals("red"))
+            return redRotate;
+        return blueRotate;
+     }
+
+     public static void setRotate(String color){
+        if (color.equals("red"))
+            redRotate=true;
+        blueRotate=true;
+     }
+
+     public static void nextStage(String color){
+        if (color.equals("red")) {
+            redStage++;
+            redCharge=0;
+        }
+        else {
+            blueStage++;
+            blueCharge=0;
+        }  
+        
+     }
+
+     public static void setColor(String color){
+        if (color.equals("red"))
+            redColor=true;
+        blueColor=true;
+     }
+
+     public static Boolean getColor(String color){
+        if (color.equals("red"))
+            return redColor;
+        return blueColor;
+     }
+
+
      public static void addCharge(String color){
         if (color.equals("red")){
-            redCharge++;
+            // check to see if we add to capacity
+            if ((redStage==0 && redCharge<9) || (redStage==1 && redCharge<20) || (redStage==2 && redCharge<20))
+                redCharge++;
+            // check to see if we need to go to next stage
+            if (redStage==0 && redCharge ==9 && matchTime>15) {
+                redStage = 1;
+                redCharge = 0;
+            }
+            else if (redStage ==1 && redCharge == 20 && redRotate) {
+                redStage = 2;
+                redCharge = 0;
+            }
+            else if (redStage ==2 && redCharge == 20 && redColor) {
+                redStage = 3;
+                redCharge = 0;
+            }
+            
             return;
         }
-        blueCharge++;
+        else { // blue charge
+            if ((blueStage==0 && blueCharge<9) || (blueStage==1 && blueCharge<20) || (blueStage==2 && blueCharge<20))
+            blueCharge++;
+        // check to see if we need to go to next stage
+        if (blueStage==0 && blueCharge ==9 && matchTime>15) {
+            blueStage = 1;
+            blueCharge = 0;
+        }
+        else if (blueStage ==1 && blueCharge == 20 && blueRotate) {
+            blueStage = 2;
+            blueCharge = 0;
+        }
+        else if (blueStage ==2 && blueCharge == 20 && blueColor) {
+            blueStage = 3;
+            blueCharge = 0;
+        }
+        
+        
+        }
+        
      }
 
      public static void addBall2Field(){
@@ -89,6 +180,7 @@ public class FRC2020Match  {
     public void runMatch() { 
         for (double i = 0; i < 150; i+=.1) { // run match at .1 second resolution
         //robot selection loop
+        matchTime = i;
             for (Robot j: myRobots) {
                 if (j.robotReady()<=i){
                 //choose an action
