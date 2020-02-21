@@ -15,6 +15,8 @@ public class FRC2020Match  {
     static int blueEndPoints = 0;
     int redRP=0;
     int blueRP=0;
+    static int redAutooints = 0;
+    static int blueAutoPoints = 0;
 
     static int ballsOnField = 10;
     static int ballsInRedLoad = 5;
@@ -227,6 +229,7 @@ public class FRC2020Match  {
          // stage 3 complete (gets 1 RP)
          // shield generator operational (>= 65 end game points)
          // end game points: 25 per robot, 15 level, 5 park
+        String scoreText = "";
         if (redSwitchBalanced) {
             redEndPoints+=15;
         }
@@ -237,8 +240,9 @@ public class FRC2020Match  {
         blueScore+=blueEndPoints;
 
 
-        return "Red = " + redScore+ " to Blue = " + blueScore + '\n' + "redEndGame " + redEndPoints + "--Blue End Game " + blueEndPoints;
-
+        scoreText = "Red = " + redScore+ " to Blue = " + blueScore + '\n' + "redEndGame " + redEndPoints + "--Blue End Game " + blueEndPoints;
+        scoreText += "AutoPoints R1 =" + myRobots[0].getAutoPoints();
+        return scoreText;
      }
      
     // simulations
