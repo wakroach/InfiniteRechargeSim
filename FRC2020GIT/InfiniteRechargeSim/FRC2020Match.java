@@ -11,6 +11,11 @@ public class FRC2020Match  {
     int score4init = 5;
     int redScore = 0;
     int blueScore = 0;
+    static int redEndPoints = 0;
+    static int blueEndPoints = 0;
+    int redRP=0;
+    int blueRP=0;
+
     static int ballsOnField = 10;
     static int ballsInRedLoad = 5;
     static int ballsInBlueLoad = 5;
@@ -28,11 +33,49 @@ public class FRC2020Match  {
 
     static int redStage=0; 
     static int blueStage=0;
+    static Boolean blueSwitchBalanced= false;
+    static Boolean redSwitchBalanced= false;
+    static int redPark=0; 
+    static int bluePark=0;
+    static int redHang=0; 
+    static int blueHang=0;
+
     Robot[] myRobots;
     // constructor 
     public FRC2020Match(Robot[] robots) {
         myRobots = robots;
         runMatch();
+    }
+
+    public static void hangRobot(String color, Boolean balanced){
+        if (color.equals("red")) {
+            redHang++;
+            if(balanced)
+                redSwitchBalanced=true;
+            else
+                redSwitchBalanced=false;
+            System.out.println("Red hang and balanced = " + redSwitchBalanced.toString());
+        }
+        if (color.equals("blue")) {
+            blueHang++;
+            if(balanced)
+                blueSwitchBalanced=true;
+            else
+                blueSwitchBalanced=false;
+
+            System.out.println("Blue hang and balanced = " + blueSwitchBalanced.toString());
+        }
+
+    }
+
+    public static void parkRobot(String color) {
+        if (color.equals("red")) {
+            redPark++;
+        }
+        if (color.equals("blue")) {
+            bluePark++;
+            System.out.println(color + " parked ");
+        }
     }
 
     //  method for robots to call to get field info
@@ -62,12 +105,38 @@ public class FRC2020Match  {
 
      public static void nextStage(String color){
         if (color.equals("red")) {
-            redStage++;
-            redCharge=0;
+            if (redStage==0 && redCharge ==9 && matchTime>15) {
+                redStage = 1;
+                redCharge = 0;
+                System.out.println("Red stage 1 " + matchTime);
+            }
+            else if (redStage ==1 && redCharge == 20 && redRotate) {
+                redStage = 2;
+                redCharge = 0;
+                System.out.println("Red stage 2: rotated " + matchTime);
+            }
+            else if (redStage ==2 && redCharge == 20 && redColor) {
+                redStage = 3;
+                redCharge = 0;
+                System.out.println("Red stage 3: colored " + matchTime);
+            }
         }
         else {
-            blueStage++;
-            blueCharge=0;
+            if (blueStage==0 && blueCharge ==9 && matchTime>15) {
+                blueStage = 1;
+                blueCharge = 0;
+                System.out.println("Blue stage 1 " + matchTime);
+             }
+             else if (blueStage ==1 && blueCharge == 20 && blueRotate) {
+                 blueStage = 2;
+                 blueCharge = 0;
+                 System.out.println("Blue stage 2: rotated " + matchTime);
+             }
+             else if (blueStage ==2 && blueCharge == 20 && blueColor) {
+                 blueStage = 3;
+                 blueCharge = 0;
+                 System.out.println("Blue stage 3: colored " + matchTime);
+             }
         }  
         
      }
@@ -91,42 +160,21 @@ public class FRC2020Match  {
             if ((redStage==0 && redCharge<9) || (redStage==1 && redCharge<20) || (redStage==2 && redCharge<20))
                 redCharge++;
             // check to see if we need to go to next stage
-            if (redStage==0 && redCharge ==9 && matchTime>15) {
-                redStage = 1;
-                redCharge = 0;
-            }
-            else if (redStage ==1 && redCharge == 20 && redRotate) {
-                redStage = 2;
-                redCharge = 0;
-            }
-            else if (redStage ==2 && redCharge == 20 && redColor) {
-                redStage = 3;
-                redCharge = 0;
-            }
             
-            return;
+            
+            //return;
         }
-        else { // blue charge
+        if (color.equals("blue")) { // blue charge
             if ((blueStage==0 && blueCharge<9) || (blueStage==1 && blueCharge<20) || (blueStage==2 && blueCharge<20))
             blueCharge++;
         // check to see if we need to go to next stage
-        if (blueStage==0 && blueCharge ==9 && matchTime>15) {
-            blueStage = 1;
-            blueCharge = 0;
-        }
-        else if (blueStage ==1 && blueCharge == 20 && blueRotate) {
-            blueStage = 2;
-            blueCharge = 0;
-        }
-        else if (blueStage ==2 && blueCharge == 20 && blueColor) {
-            blueStage = 3;
-            blueCharge = 0;
-        }
+            
         
         
         }
+        nextStage(color);
         
-     }
+     } // method end
 
      public static void addBall2Field(){
         ballsOnField++;
@@ -154,12 +202,14 @@ public class FRC2020Match  {
         if (color.equals("blue")) {
             if (ballsInBlueLoad>14)
                 ballsOnField++;
-            ballsInBlueLoad++;
+            else
+                ballsInBlueLoad++;
         }
         else {
             if (ballsInRedLoad>14) 
                 ballsOnField++;
-            ballsInRedLoad++;
+            else
+                ballsInRedLoad++;
             
         }
      }
@@ -173,7 +223,22 @@ public class FRC2020Match  {
      
 
      public String getScores() {
-        return "Red = " + redScore+ " to Blue = " + blueScore;
+         // determine if ranking points
+         // stage 3 complete (gets 1 RP)
+         // shield generator operational (>= 65 end game points)
+         // end game points: 25 per robot, 15 level, 5 park
+        if (redSwitchBalanced) {
+            redEndPoints+=15;
+        }
+        redScore+=redEndPoints;
+        if (blueSwitchBalanced) {
+            blueEndPoints+=15;
+        }
+        blueScore+=blueEndPoints;
+
+
+        return "Red = " + redScore+ " to Blue = " + blueScore + '\n' + "redEndGame " + redEndPoints + "--Blue End Game " + blueEndPoints;
+
      }
      
     // simulations
